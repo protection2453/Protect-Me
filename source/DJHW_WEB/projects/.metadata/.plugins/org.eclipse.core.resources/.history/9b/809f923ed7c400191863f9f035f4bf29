@@ -1,0 +1,207 @@
+package comm;
+
+import java.io.FileInputStream;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Properties;
+import util.AESDec;
+
+//��� Ŭ����
+public class CommDAO {
+	private Connection conn;
+	private ResultSet rs;
+	private AESDec aes;	
+	//��� �����ͺ��̽� ����
+	public CommDAO() {
+		try {
+			//�����ͺ��̽� ��ȣ ����
+	        String propFile = "C:\\Users\\DJHW\\Desktop\\JSP\\projects\\BBS\\src\\util\\key.properties";
+	        Properties props = new Properties();
+	        FileInputStream fis = new FileInputStream(propFile);	         
+	        props.load(new java.io.BufferedInputStream(fis));			
+
+			String read_key = "C:\\key_management\\keymanagement.properties";
+	        Properties key = new Properties();	        
+	        FileInputStream key_fis = new FileInputStream(read_key);
+	        key.load(new java.io.BufferedInputStream(key_fis));
+	        
+	        String aes_key = key.getProperty("key");
+	        aes = new AESDec(aes_key);
+	        
+			String dbURL = "jdbc:mysql://localhost:3306/BBS?serverTimezone=UTC";
+			String dbID = "root";
+			String dbPassword = aes.aesDecode(props.getProperty("password"));
+			
+			Class.forName("com.mysql.cj.jdbc.Driver");
+			conn = DriverManager.getConnection(dbURL, dbID, dbPassword);
+		} catch (Exception e) {
+			System.err.println("CommDAO Exception error");
+		}
+	}
+	
+	//��� �ۼ� ��¥ ȹ��
+	public String getDate() {
+		String SQL = "SELECT NOW()";
+		PreparedStatement pstmt = null;
+		try {
+			pstmt = conn.prepareStatement(SQL);
+			rs = pstmt.executeQuery();
+			if(rs.next()) {
+				return rs.getString(1);
+			}
+		} catch (Exception e) {
+			System.err.println("GetDate Exception error");	
+		} finally {
+			if(pstmt != null) {
+				try {
+					pstmt.close();
+				} catch (SQLException e) {
+					System.err.println("GetDate SQLException error");	
+				}
+			}
+		}
+		return ""; //�����ͺ��̽� ����
+	}
+	
+	//����� 1���������� �Ǻ�
+	public int getNext() {
+		String SQL = "SELECT commID FROM COMM ORDER BY commID DESC";
+		try {
+			PreparedStatement pstmt = conn.prepareStatement(SQL);
+			rs = pstmt.executeQuery();
+			if(rs.next()) {
+				return rs.getInt(1)+1;
+			}
+			return 1; //ù��° �Խù��� ���
+		} catch (Exception e) {
+			System.err.println("getNext Exception error");
+		}
+		return -1; //�����ͺ��̽� ����
+	}
+	
+	//��� �ۼ�
+	public int write(String commTitle, String userID, String commContent, int bbsID) {
+		String SQL = "INSERT INTO COMM VALUES(?,?,?,?,?,?)";
+		try {
+			PreparedStatement pstmt = conn.prepareStatement(SQL);
+			pstmt.setInt(1, getNext());
+			pstmt.setString(2, commTitle);
+			pstmt.setString(3, userID);
+			pstmt.setString(4, getDate());
+			pstmt.setString(5, commContent);
+			pstmt.setInt(6, bbsID);
+			return pstmt.executeUpdate();
+		} catch (Exception e) {
+			System.err.println("Write Exception error");
+		}
+		return -1; //�����ͺ��̽� ����
+	}
+	
+	//��� �������� ��� 10���� �����Ͽ� ����Ʈ ����
+	public ArrayList<Comm> getList(int pageNumber) {
+		String SQL = "SELECT * FROM COMM WHERE commID < ? ORDER BY commID DESC LIMIT 10";
+		ArrayList<Comm> list = new ArrayList<Comm>();
+		try {
+			PreparedStatement pstmt = conn.prepareStatement(SQL);
+			pstmt.setInt(1,  getNext() - (pageNumber - 1) * 10);
+			rs = pstmt.executeQuery();
+			while(rs.next()) {
+				Comm comm = new Comm();
+				comm.setCommID(rs.getInt(1));
+				comm.setCommTitle(rs.getString(2));
+				comm.setUserID(rs.getString(3));
+				comm.setCommDate(rs.getString(4));
+				comm.setCommContent(rs.getString(5));
+				comm.setBbsID(rs.getInt(6));
+				list.add(comm);
+			}
+		} catch (Exception e) {
+			System.err.println("ArrayList Exception error");
+		}
+		return list;	
+	}
+	
+	//��� ������ �̵�
+	public boolean nextPage(int pageNumber) {
+		String SQL = "SELECT * FROM COMM WHERE commID < ?";
+		try {
+			PreparedStatement pstmt = conn.prepareStatement(SQL);
+			pstmt.setInt(1, getNext() - (pageNumber - 1) * 10);
+			rs = pstmt.executeQuery();
+			if (rs.next()) {
+				return true;
+			}
+		} catch (Exception e) {
+			System.err.println("nextPage Exception error");
+		}
+		return false;
+	}
+	
+	//�ش� ��� ���� ȹ��
+	public Comm getComm(int commID) {
+		String SQL = "SELECT * FROM COMM WHERE commID = ?";
+		try {
+			PreparedStatement pstmt = conn.prepareStatement(SQL);
+			pstmt.setInt(1, commID);
+			rs = pstmt.executeQuery();
+			if (rs.next()) {
+				Comm comm = new Comm();
+				comm.setCommID(rs.getInt(1));
+				comm.setCommTitle(rs.getString(2));
+				comm.setUserID(rs.getString(3));
+				comm.setCommDate(rs.getString(4));
+				comm.setCommContent(rs.getString(5));
+				comm.setBbsID(rs.getInt(6));
+				return comm;
+			}
+		} catch (Exception e) {
+			System.err.println("getComm Exception error");
+		}
+		return null;		
+	}
+	
+	//��� ����
+	public int update(int commID, String commTitle, String commContent) {
+		String SQL = "UPDATE COMM SET commTitle = ?, commContent = ? WHERE commID = ?";
+		try {
+			PreparedStatement pstmt = conn.prepareStatement(SQL);
+			pstmt.setString(1, commTitle);
+			pstmt.setString(2, commContent);
+			pstmt.setInt(3, commID);			
+			return pstmt.executeUpdate();
+		} catch (Exception e) {
+			System.err.println("Update Exception error");
+		}
+		return -1; //�����ͺ��̽� ����		
+	}
+	
+	//��� ����
+	public int delete(int commID) {
+		String SQL = "DELETE FROM COMM WHERE commID = ?";
+		try {
+			PreparedStatement pstmt = conn.prepareStatement(SQL);
+			pstmt.setInt(1, commID);
+			return pstmt.executeUpdate();
+		} catch (Exception e) {
+			System.err.println("Delete Exception error");
+		}
+		return -1; //�����ͺ��̽� ����			
+	}
+	
+	//ȸ��Ż��� �ش� ��� ����
+	public int remove_comment(String userID) {
+		String SQL = "DELETE FROM COMM WHERE userID = ?";
+		try {
+			PreparedStatement pstmt = conn.prepareStatement(SQL);
+			pstmt.setString(1, userID);
+			return pstmt.executeUpdate();
+		} catch (Exception e) {
+			System.err.println("remove comment Exception error");
+		}
+		return -1; //�����ͺ��̽� ����			
+	}	
+}

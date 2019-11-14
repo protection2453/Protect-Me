@@ -1,0 +1,85 @@
+package util;
+
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.util.Properties;
+
+import javax.crypto.BadPaddingException;
+import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+import javax.crypto.spec.SecretKeySpec;
+
+import com.mysql.cj.x.protobuf.MysqlxDatatypes.Scalar.String;
+
+public class AESDecrypt {
+	
+	public String Decrypt(String encrypted) {
+		
+		@SuppressWarnings("unused")
+		String keyStr="";
+		
+	     try {
+	    	 String propFile = "C:\\key_management\\keymanagement.properties";
+		     Properties props = new Properties();
+		         
+		     FileInputStream fis = new FileInputStream(propFile);
+		     props.load(new java.io.BufferedInputStream(fis));
+		     
+		     String dbaccess_key = props.getProperty("key");
+				
+		     SecretKeySpec secretKeySpec = new SecretKeySpec(dbaccess_key.getBytes(), "AES");
+
+		     Cipher cipher;
+
+		     cipher = Cipher.getInstance("AES");
+			
+		     cipher.init(Cipher.DECRYPT_MODE, secretKeySpec);
+		         
+		     byte[] original = cipher.doFinal(hexToByteArray(encrypted));
+		         
+		     keyStr = new String(original);
+		     System.out.println("ke!!! :"+keyStr);
+		         
+		} catch (IOException e) {
+			
+			e.printStackTrace();
+		}catch (NoSuchAlgorithmException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (NoSuchPaddingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InvalidKeyException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IllegalBlockSizeException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (BadPaddingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return encrypted;
+			
+	}
+	
+	private byte[] hexToByteArray(String hex) {
+	     
+	    if(hex == null || hex.length() == 0){
+	        return null;
+	    }
+	     
+	    //16진수 문자열을 byte로 변환
+	    byte[] byteArray = new byte[hex.length() /2 ];
+	     
+	    for(int i=0; i<byteArray.length; i++){
+	        byteArray[i] = (byte) Integer.parseInt(hex.substring(2 * i, 2*i+2), 16);
+	    }
+	    return byteArray;
+	}
+
+
+}
