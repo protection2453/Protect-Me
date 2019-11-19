@@ -10,23 +10,42 @@
 - Language : Html5, css, javascript, php
 - DB : MariaDB
 - WAS : Tomcat Apache
-## Screenshots
+
+## Web Screenshots
+
 ### 1. Main Page
-![하람마켓_1](https://user-images.githubusercontent.com/44967457/69146772-dd1a6480-0b13-11ea-88d3-3dd7a7f9dc71.JPG)
+![image02](https://user-images.githubusercontent.com/44967457/69170951-5333c100-0b3e-11ea-9fc8-b048fa75ee50.png)
 <hr>
 <br>
 
-### 2. Product Page
-![하람마켓_2](https://user-images.githubusercontent.com/44967457/69146774-dee42800-0b13-11ea-9534-c81495641bc7.JPG)
+### 2. Clinic Place Page
+![image03](https://user-images.githubusercontent.com/44967457/69170952-5333c100-0b3e-11ea-8e44-d9c8a5684fab.png)
 <hr>
 <br>
 
-### 3. Sale Request Page
-![하람마켓3](https://user-images.githubusercontent.com/44967457/69146776-e0155500-0b13-11ea-8f61-f888cedd384b.JPG)
+### 3. Online Clinic Page
+![image04](https://user-images.githubusercontent.com/44967457/69170953-53cc5780-0b3e-11ea-9021-99d30de828f9.png)
 <hr>
 <br>
 
-### 4. About Us Page
-![하람마켓4](https://user-images.githubusercontent.com/44967457/69146778-e0adeb80-0b13-11ea-9073-8482f2a914fc.jpg)
+### 4. Online Clinic Writing Page
+![image05](https://user-images.githubusercontent.com/44967457/69170954-53cc5780-0b3e-11ea-8e79-161212960e14.png)
+<hr>
+<br>
+
+## App Screenshots
+
+### 1. Main Activity
+![image07](https://user-images.githubusercontent.com/44967457/69170955-53cc5780-0b3e-11ea-99f7-47e1c3f189be.png)
+<hr>
+<br>
+
+### 2. Function check(send 112 message and scream)
+![image08](https://user-images.githubusercontent.com/44967457/69170957-5464ee00-0b3e-11ea-8f6e-f7317dfbf999.png)
+<hr>
+<br>
+
+### 3. Danger Time Notice Function
+![image09](https://user-images.githubusercontent.com/44967457/69170958-5464ee00-0b3e-11ea-8435-53857e71c8bd.png)
 <hr>
 <br>
