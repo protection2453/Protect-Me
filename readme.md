@@ -9,7 +9,7 @@
 - Editor : Eclipse
 - Language : Html5, css, javascript, php
 - DB : MariaDB
-- WAS : Tomcat Apache
+- WEB/WAS : Apache/Tomcat 
 
 ## Web Screenshots
 
